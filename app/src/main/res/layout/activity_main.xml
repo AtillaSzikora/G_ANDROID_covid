@@ -55,16 +55,14 @@
         android:id="@+id/logInButton"
         android:layout_below="@+id/passwordField"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:onClick="logInButtonClick" />
+        android:layout_alignParentStart="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Sign Up"
-        android:id="@+id/signUpButtom"
+        android:id="@+id/signUpButton"
         android:layout_below="@+id/passwordField"
         android:layout_alignRight="@+id/passwordField"
-        android:layout_alignEnd="@+id/passwordField"
-        android:onClick="signUpButtonClick" />
+        android:layout_alignEnd="@+id/passwordField" />
 </RelativeLayout>

@@ -3,37 +3,57 @@ package com.szikora.covid;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import com.google.gson.Gson;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-    EditText email;
-    EditText password;
+    private EditText email;
+    private EditText password;
+    private Button logInButton;
+    private Button signUpButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         email = (EditText) findViewById(R.id.emailField);
         password = (EditText) findViewById(R.id.passwordField);
+        logInButton= (Button) findViewById(R.id.logInButton);
+        signUpButton= (Button) findViewById(R.id.signUpButton);
+        logInButtonClick();
+        signUpButtonClick();
     }
 
-    public void signUpButtonClick(View view) {
-        writeUserToSharedPref(getUserFromInput());
-    }
+    private void logInButtonClick() {
+        logInButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (readUserFromSharedPref()) {
+                    Toast.makeText(getApplicationContext(), "Successful log in!", Toast.LENGTH_LONG).show(); }
+                else { Toast.makeText(getApplicationContext(), "Wrong email or password!", Toast.LENGTH_LONG).show(); }
+            } }); }
 
-    private User getUserFromInput() {
-        return new User(email.getText().toString(), password.getText().toString());
-    }
+    private void signUpButtonClick() {
+        signUpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                validateInputs();
+            } }); }
 
-    public void logInButtonClick (View view) {
-        if (readUserFromSharedPref()) {
-            Toast.makeText(getApplicationContext(), "Successful log in!", Toast.LENGTH_LONG).show(); }
-        else { Toast.makeText(getApplicationContext(), "Wrong email or password!", Toast.LENGTH_LONG).show(); }
+    private void validateInputs() {
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email.getText().toString()).matches()) {
+                Toast.makeText(getApplicationContext(), "Wrong email format!", Toast.LENGTH_LONG).show(); }
+            else if (
+                    password.getText().toString().length() < 4) {
+            Toast.makeText(getApplicationContext(), "Too short password!", Toast.LENGTH_LONG).show(); }
+        else {
+            writeUserToSharedPref(new User(email.getText().toString(), password.getText().toString()));
+            Toast.makeText(getApplicationContext(), email.getText().toString() + " successfully signed up!", Toast.LENGTH_LONG).show(); }
     }
 
     private void writeUserToSharedPref(User user) {
@@ -55,8 +75,9 @@ public class MainActivity extends AppCompatActivity {
         for(Map.Entry<String,?> entry : usersMap.entrySet()){
             userJson = (String) entry.getValue();
             user = gson.fromJson(userJson, User.class);
-            Log.i("Ez itt az", user.getEmail());
-            if(user.getEmail().equals(email.getText().toString())){ return true; } }
+            if(user.getEmail().equals(email.getText().toString())
+            && user.getPassword().equals(password.getText().toString())){
+                return true; } }
         return false;
     }
 }
