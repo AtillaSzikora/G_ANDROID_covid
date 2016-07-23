@@ -15,26 +15,32 @@ public class MainActivity extends AppCompatActivity {
     private EditText password;
     private Button logInButton;
     private Button signUpButton;
+    private SharedPreferences mPrefs;
+    private boolean isEmailExist;
+    private Gson gson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        initialization(); }
 
+    private void initialization() {
         email = (EditText) findViewById(R.id.emailField);
         password = (EditText) findViewById(R.id.passwordField);
         logInButton= (Button) findViewById(R.id.logInButton);
         signUpButton= (Button) findViewById(R.id.signUpButton);
+        mPrefs = getPreferences(MODE_PRIVATE);
+        gson = new Gson();
         logInButtonClick();
-        signUpButtonClick();
-    }
+        signUpButtonClick(); }
 
     private void logInButtonClick() {
         logInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (readUserFromSharedPref()) {
-                    Toast.makeText(getApplicationContext(), "Successful log in!", Toast.LENGTH_LONG).show(); }
+                if (isAccountExist()) {
+                    Toast.makeText(getApplicationContext(), "Successfully logged in!", Toast.LENGTH_LONG).show(); }
                 else { Toast.makeText(getApplicationContext(), "Wrong email or password!", Toast.LENGTH_LONG).show(); }
             } }); }
 
@@ -42,42 +48,35 @@ public class MainActivity extends AppCompatActivity {
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                validateInputs();
+                if (!isAccountExist() && !isEmailExist) { validateInputs();
+                } else {
+                    Toast.makeText(getApplicationContext(), "User already exists!", Toast.LENGTH_SHORT).show(); }
             } }); }
 
     private void validateInputs() {
-            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email.getText().toString()).matches()) {
-                Toast.makeText(getApplicationContext(), "Wrong email format!", Toast.LENGTH_LONG).show(); }
-            else if (
-                    password.getText().toString().length() < 4) {
-            Toast.makeText(getApplicationContext(), "Too short password!", Toast.LENGTH_LONG).show(); }
-        else {
-            writeUserToSharedPref(new User(email.getText().toString(), password.getText().toString()));
-            Toast.makeText(getApplicationContext(), email.getText().toString() + " successfully signed up!", Toast.LENGTH_LONG).show(); }
-    }
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email.getText().toString()).matches()) {
+            Toast.makeText(getApplicationContext(), "Wrong email format!", Toast.LENGTH_LONG).show();
+        } else if (
+            password.getText().toString().length() < 4) {
+            Toast.makeText(getApplicationContext(), "Too short password!", Toast.LENGTH_LONG).show();
+        } else {
+            putUserToSharedPref(new User(email.getText().toString(), password.getText().toString()));
+            Toast.makeText(getApplicationContext(), email.getText().toString() + " successfully signed up!", Toast.LENGTH_LONG).show(); } }
 
-    private void writeUserToSharedPref(User user) {
-        SharedPreferences mPrefs = getPreferences(MODE_PRIVATE);
+    private void putUserToSharedPref(User user) {
         SharedPreferences.Editor prefsEditor = mPrefs.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(user);
-        prefsEditor.putString(user.getEmail(), json);
-        prefsEditor.apply();
-    }
+        String userJson = gson.toJson(user);
+        prefsEditor.putString(user.getEmail(), userJson);
+        prefsEditor.apply(); }
 
-    private boolean readUserFromSharedPref() {
-        SharedPreferences mPrefs = getPreferences(MODE_PRIVATE);
-        Gson gson = new Gson();
-        String userJson;
-        User user;
-
+    private boolean isAccountExist() {
         Map<String,?> usersMap = mPrefs.getAll();
         for(Map.Entry<String,?> entry : usersMap.entrySet()){
-            userJson = (String) entry.getValue();
-            user = gson.fromJson(userJson, User.class);
+            String userJson = (String) entry.getValue();
+            User user = gson.fromJson(userJson, User.class);
+            isEmailExist = user.getEmail().equals(email.getText().toString());
             if(user.getEmail().equals(email.getText().toString())
             && user.getPassword().equals(password.getText().toString())){
                 return true; } }
-        return false;
-    }
+        return false; }
 }
