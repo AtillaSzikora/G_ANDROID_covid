@@ -55,7 +55,8 @@
         android:id="@+id/logInButton"
         android:layout_below="@+id/passwordField"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:onClick="logInButtonClick" />
 
     <Button
         android:layout_width="wrap_content"
@@ -64,5 +65,6 @@
         android:id="@+id/signUpButton"
         android:layout_below="@+id/passwordField"
         android:layout_alignRight="@+id/passwordField"
-        android:layout_alignEnd="@+id/passwordField" />
+        android:layout_alignEnd="@+id/passwordField"
+        android:onClick="signUpButtonClick" />
 </RelativeLayout>
