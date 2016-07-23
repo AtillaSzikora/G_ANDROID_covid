@@ -6,16 +6,18 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import com.google.gson.Gson;
+
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     private EditText email;
     private EditText password;
     private SharedPreferences mPrefs;
-    private boolean isEmailExist;
     private Gson gson = new Gson();
     private String userJson;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void logInButtonClick(View view) {
-        if (isAccountExist()) {
+        if (areEmailAndPassExist()) {
             Toast.makeText(getApplicationContext(), "Successfully logged in!", Toast.LENGTH_LONG).show();
         } else {
             Toast.makeText(getApplicationContext(), "Wrong email or password!", Toast.LENGTH_LONG).show();
@@ -36,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void signUpButtonClick(View view) {
         if (areInputsValid()) {
-            if (isAccountExist() || isEmailExist) {
+            if (isEmailExist()) {
                 Toast.makeText(getApplicationContext(), "User already exists!", Toast.LENGTH_SHORT).show();
             } else {
                 signUpUser(new User(email.getText().toString(), password.getText().toString()));
@@ -57,19 +59,26 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private boolean isAccountExist() {
-        User user;
+    private boolean areEmailAndPassExist() {
+        Map<String, ?> usersMap = mPrefs.getAll();
+        for (Map.Entry<String, ?> entry : usersMap.entrySet()) {
+            userJson = (String) entry.getValue();
+            user = gson.fromJson(userJson, User.class);
+            if (user.getEmail().equals(email.getText().toString())
+                    && user.getPassword().equals(password.getText().toString())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isEmailExist() {
         Map<String, ?> usersMap = mPrefs.getAll();
         for (Map.Entry<String, ?> entry : usersMap.entrySet()) {
             userJson = (String) entry.getValue();
             user = gson.fromJson(userJson, User.class);
             if (user.getEmail().equals(email.getText().toString())) {
-                isEmailExist = true;
-                if (user.getPassword().equals(password.getText().toString())) {
-                    return true;
-                }
-            } else {
-                isEmailExist = false;
+                return true;
             }
         }
         return false;
