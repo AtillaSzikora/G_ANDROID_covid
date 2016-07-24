@@ -10,11 +10,10 @@ import com.google.gson.Gson;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-    private EditText email;
-    private EditText password;
+    private EditText email, password;
     private SharedPreferences mPrefs;
     private Map<String, ?> usersMap;
-    private String userJson;
+    private String userJson, passwordRegex;
     private Gson gson;
     private User user;
     private String[] toastMessages;
@@ -24,13 +23,14 @@ public class MainActivity extends AppCompatActivity {
         password = (EditText) findViewById(R.id.passwordField);
         mPrefs = getPreferences(MODE_PRIVATE);
         gson = new Gson();
+        passwordRegex = "^[a-zA-Z0-9]{4,}$";
         toastMessages = new String[]{
                 "Successfully logged in!",
                 "Wrong email or password!",
                 "User already exists!",
                 " successfully signed up!",
-                "Wrong email format!",
-                "Too short password!"};
+                "Wrong email format!\npattern: let@me.in",
+                "Password has to be alphanumeric\nand at least 4 characters long!"};
     }
 
     @Override
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email.getText().toString()).matches()) {
             Toast.makeText(MainActivity.this, toastMessages[4], Toast.LENGTH_LONG).show();
             return false;
-        } else if (password.getText().toString().length() < 4) {
+        } else if (!password.getText().toString().matches(passwordRegex)) {
             Toast.makeText(MainActivity.this, toastMessages[5], Toast.LENGTH_LONG).show();
             return false;
         }
