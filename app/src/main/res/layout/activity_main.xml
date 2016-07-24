@@ -67,4 +67,14 @@
         android:layout_alignRight="@+id/passwordField"
         android:layout_alignEnd="@+id/passwordField"
         android:onClick="signUpButtonClick" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Clear"
+        android:id="@+id/clearButton"
+        android:layout_alignBottom="@+id/signUpButton"
+        android:layout_centerHorizontal="true"
+        android:onClick="clearButtonClick" />
+
 </RelativeLayout>
